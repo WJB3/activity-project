@@ -8,6 +8,7 @@
   },
   "dependencies": {
     "egg": "^2.15.1",
+    "egg-cors": "^2.2.3",
     "egg-scripts": "^2.11.0",
     "pump": "^3.0.0",
     "silly-datetime": "^0.1.2"

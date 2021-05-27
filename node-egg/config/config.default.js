@@ -20,6 +20,17 @@ module.exports = appInfo => {
   // add your middleware config here
   config.middleware = [];
 
+  config.cors = {
+    origin: '*', // 表示允许的源
+    allowMethods: 'GET,HEAD,PUT,POST,DELETE,PATCH' // 表示允许的http请求方式
+  };
+
+  config.security={
+    csrf:{
+      enable:false
+    }
+  }
+
   // add your user config here
   const userConfig = {
     // myAppName: 'egg',

@@ -2,6 +2,7 @@
 
 const Controller = require('egg').Controller;
 const pump=require('pump');
+const fs=require('fs');
 
 class HomeController extends Controller {
   async saveImage() {
@@ -15,7 +16,7 @@ class HomeController extends Controller {
         }
         const fieldname=stream.fieldname;
         //上传图片的目录
-        const dir=await this.service.tools.saveImage(stream.filename);
+        const dir=await this.service.tools.getUploadFile(stream.filename);
         const target=dir.uploadDir;
         const writeStream=fs.createWriteStream(target);
 
