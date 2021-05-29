@@ -23,7 +23,7 @@ class ToolsService extends Service{
             uploadDir,
             saveDir: this.ctx.origin + uploadDir.slice(3).replace(/\\/g, '/')
         }
-    }
+    } 
 }
 
 module.exports=ToolsService;

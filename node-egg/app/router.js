@@ -4,8 +4,27 @@
  * @param {Egg.Application} app - egg application
  */
 module.exports = app => {
-  const { router, controller } = app;
-  router.get('/', controller.home.index);
+  const { router, controller,jwt } = app; 
 
-  router.post('/tools/resource', controller.tools.saveImage);
+  //user接口
+  router.get('/user/list', jwt,controller.users.getList);
+  //增加会员/注册
+  router.post('/user',controller.users.create);
+  //删除会员
+  router.delete('/user/:id',jwt,controller.users.delete);
+  //查看会员
+  router.get('/user/:id',jwt,controller.users.get);
+  //编辑会员
+  router.put('/user',jwt,controller.users.edit); 
+  //发送验证码
+  router.post('/user/sendCode',controller.users.sendCode); 
+
+  //登陆接口
+  router.post('/login',controller.auth.login);
+
+  //创建活动接口
+  router.post('/activity',jwt,controller.activity.create)
+  //活动列表接口
+  router.get('/activity/list', jwt,controller.activity.getList);
+
 };
