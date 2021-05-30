@@ -49,4 +49,9 @@ alter table activity add userId int
 # 第十三步：创建主外键关联关系
 alter table activity add foreign key(userId) references users(id);
 
+# 第十四步：修改stock为字符类型
+alter table company modify column stockcode varchar(255);
+
+# 第十五步：修改stock为字符类型
+create table finance(id int(11) primary key auto_increment,year varchar(255),total varchar(255),liabilityratio varchar(255), operatingactivities varchar(255),operatingincome varchar(255),netprofit varchar(255));
  

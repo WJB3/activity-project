@@ -29,7 +29,7 @@ module.exports = app => {
   router.post('/activity',jwt,controller.activity.create)
   //活动列表接口
   router.get('/activity/list', jwt,controller.activity.getList);
-  //删除会员
+  //删除活动
   router.delete('/activity/:id',jwt,controller.activity.delete);
 
   //管理员注册

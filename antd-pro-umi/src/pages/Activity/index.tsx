@@ -1,17 +1,31 @@
 
 import React, { useEffect, useRef, useState } from 'react';
-import { Table, Tag, Input, Card, Button, Drawer, Form, Row, Col, InputNumber, Space, } from 'antd';
+import { Table, Tag, Input, Popconfirm, Card, Button, Drawer, InputNumber, Form, Row, Col, Image, Space, message, } from 'antd';
 import { PageContainer } from '@ant-design/pro-layout';
 import ImagePicker from './components/ImagePicker';
-import CompanyForm from './components/CompanyForm';
+import HightlightsForm from './components/HighlightForm';
 import StatusSelect from './components/StatusSelect';
-import { add } from '@/services/activity';
-import { getList } from '@/services/user'; 
+import LanguageSelect from './components/LanguageSelect';
+import StockSelect from './components/StockSelect'
+import FinancialForm from './components/FinancialForm'
+import { add, getList, deleteItem } from '@/services/activity';
+
+const layout = {
+  labelCol: { span: 6 },
+  wrapperCol: { span: 18 },
+};
+
+const allLayout = {
+  labelCol: { span: 1 },
+  wrapperCol: { span: 22 },
+}
 
 
 const TableList: React.FC = () => {
 
   const [dataSource, setDataSource] = useState([]);
+
+  const [_, forceUpdate] = useState([]);
 
   const [loading, setLoading] = useState(false);
 
@@ -29,31 +43,123 @@ const TableList: React.FC = () => {
     setPagination(pagination)
   }
 
+  const handleReset=()=>{
+    form.resetFields();
+  }
+
+  const handleDelete = (record: any) => {
+    deleteItem(record.id).then(res => {
+      message.success('活动删除成功！');
+      forceUpdate([]);
+    })
+  }
+
   const columns = [
     {
-      title: '用户名',
-      dataIndex: 'username',
-      key: 'username',
+      title: '活动名称',
+      dataIndex: 'title',
+      key: 'title',
     },
     {
-      title: '手机号',
-      dataIndex: 'phone',
-      key: 'phone',
+      title: '活动图片',
+      dataIndex: 'title_img',
+      key: 'title_img',
+      render: (text: any) => {
+        return <Image src={text} width={100} height={100} />
+      }
     },
     {
-      title: '邮箱',
-      dataIndex: 'email',
-      key: 'email',
+      title: '活动部门',
+      dataIndex: 'sector',
+      key: 'sector',
     },
     {
-      status: '状态',
-      dataIndex: 'status',
-      render: (text: string) => {
-        if (text === '1') {
-          return <Tag color="success">{'正常'}</Tag>
+      title: '募集状态',
+      dataIndex: 'formstatus',
+      render: (text: string | number) => {
+        console.log("text", text)
+        if (text == 1) {
+          return <Tag color="warning">{'准备募集'}</Tag>
+        } else if (text == 2) {
+          return <Tag color='blue'>{'募集中'}</Tag>
+        } else if (text == 3) {
+          return <Tag color="success">{'募集结束'}</Tag>
         } else {
           return <Tag color="error">{'异常'}</Tag>
         }
+      }
+    },
+
+    {
+      title: '活动内容',
+      dataIndex: 'content',
+      key: 'content',
+    },
+    {
+      title: '融资目标',
+      dataIndex: 'fundingTarget',
+      key: 'fundingTarget',
+    },
+    {
+      title: '活动横幅',
+      dataIndex: 'banner',
+      key: 'banner',
+      render: (text: any) => {
+        return <Image src={text} width={100} height={100} />
+      }
+    },
+    {
+      title: '活动承接',
+      dataIndex: 'underwrite',
+      key: 'underwrite',
+    },
+    {
+      title: '活动网站',
+      dataIndex: 'website',
+      key: 'website',
+    },
+    {
+      title: '公司logo',
+      dataIndex: 'company_logo',
+      key: 'company_logo',
+      render: (text: any) => {
+        return <Image src={text} width={100} height={100} />
+      }
+    },
+    {
+      title: '状态',
+      dataIndex: 'status',
+      render: (text: string | number) => {
+        if (text == 0) {
+          return <Tag color="warning">{'待审核'}</Tag>
+        } else if (text == 1) {
+          return <Tag color="warning">{'审核通过'}</Tag>
+        } else {
+          return <Tag color="error">{'异常'}</Tag>
+        }
+      }
+    },
+    // {
+    //   title: '活动口号',
+    //   dataIndex: 'slogan',
+    //   key: 'slogan',
+    // },
+    {
+      status: '操作',
+      dataIndex: 'action',
+      render: (text: string, record) => {
+        return (
+          <Space>
+            <Popconfirm
+              title="确定要删除此活动吗，删除后不可恢复?"
+              onConfirm={() => handleDelete(record)}
+              okText="确定"
+              cancelText="取消"
+            >
+              <Button danger size={"small"} >删除</Button>
+            </Popconfirm>
+          </Space>
+        )
       }
     }
   ];
@@ -80,11 +186,16 @@ const TableList: React.FC = () => {
         total
       })
     }).catch(e => setLoading(false))
-  }, [pagination.pageSize, pagination.current]);
+  }, [pagination.pageSize, pagination.current, _]);
 
-  const onFinish=(values:any)=>{
-    console.log("onFinish",values)
-    add(values)
+  const onFinish = (values: any) => {
+    console.log("onFinish", values)
+    add(values).then(res => {
+      message.success('创建任务成功');
+      form.resetFields();
+      forceUpdate([]);
+      setFormVisible(false);
+    })
   }
 
   return (
@@ -111,6 +222,7 @@ const TableList: React.FC = () => {
           form={form}
           name="activity_form"
           onFinish={onFinish}
+          {...layout}
         >
           <Row gutter={20}>
             <Col span={6} key={0}>
@@ -142,7 +254,7 @@ const TableList: React.FC = () => {
                 <ImagePicker />
               </Form.Item>
             </Col>
-            {/* <Col span={6} key={2}>
+            <Col span={6} key={2}>
               <Form.Item
                 name={`sector`}
                 label={`活动部门`}
@@ -161,7 +273,7 @@ const TableList: React.FC = () => {
 
             <Col span={6} key={3}>
               <Form.Item
-                name={`status`}
+                name={`formstatus`}
                 label={`活动状态`}
                 rules={[
                   {
@@ -173,7 +285,7 @@ const TableList: React.FC = () => {
                 <StatusSelect />
               </Form.Item>
             </Col>
-            <Col span={12} key={4}>
+            <Col span={6} key={4}>
               <Form.Item
                 name={`content`}
                 label={`活动内容`}
@@ -184,7 +296,7 @@ const TableList: React.FC = () => {
                   },
                 ]}
               >
-                <Input.TextArea placeholder={"请输入活动内容"} autoSize={{ minRows: 5 }} />
+                <Input.TextArea placeholder={"请输入活动内容"} autoSize={{ minRows: 3 }} />
               </Form.Item>
             </Col>
             <Col span={6} key={5}>
@@ -212,7 +324,7 @@ const TableList: React.FC = () => {
                   },
                 ]}
               >
-                <Input.TextArea placeholder={"请输入活动口号"} autoSize={{ minRows: 5 }} />
+                <Input.TextArea placeholder={"请输入活动口号"} autoSize={{ minRows: 3 }} />
               </Form.Item>
             </Col>
             <Col span={6} key={7}>
@@ -229,7 +341,7 @@ const TableList: React.FC = () => {
                 <ImagePicker />
               </Form.Item>
             </Col>
-            <Col span={12} key={8}>
+            <Col span={6} key={8}>
               <Form.Item
                 name={`overview`}
                 label={`活动概述`}
@@ -240,7 +352,7 @@ const TableList: React.FC = () => {
                   },
                 ]}
               >
-                <Input.TextArea placeholder={"请输入活动口号"} autoSize={{ minRows: 5 }} />
+                <Input.TextArea placeholder={"请输入活动口号"} autoSize={{ minRows: 3 }} />
               </Form.Item>
             </Col>
             <Col span={6} key={9}>
@@ -271,7 +383,7 @@ const TableList: React.FC = () => {
                 <Input placeholder={"请输入活动网站"} />
               </Form.Item>
             </Col>
-            <Col span={6} key={11}>
+            <Col span={6} key={18}>
               <Form.Item
                 name={`company_logo`}
                 label={`公司logo`}
@@ -284,31 +396,77 @@ const TableList: React.FC = () => {
               >
                 <ImagePicker />
               </Form.Item>
-            </Col> */}
-            <Col span={24} key={12}>
+            </Col>
+            <Col span={6} key={19}>
               <Form.Item
-                name={`highlights`}
-                label={`公司`}
+                name={`type`}
+                label={`债券类型`}
                 rules={[
                   {
                     required: true,
-                    message: '公司必填!',
+                    message: '债券类型必填!',
                   },
                 ]}
               >
-                <CompanyForm />
+                <StockSelect />
+              </Form.Item>
+            </Col>
+            <Col span={6} key={20}>
+              <Form.Item
+                name={`language`}
+                label={`语言`}
+                rules={[
+                  {
+                    required: true,
+                    message: '语言必填!',
+                  },
+                ]}
+              >
+                <LanguageSelect />
+              </Form.Item>
+            </Col>
+            <Col span={24} key={21} >
+              <Form.Item
+                {...allLayout}
+                name={`highlights`}
+                label={`亮点`}
+                rules={[
+                  {
+                    required: false,
+                    message: '亮点必填!',
+                  },
+                ]}
+              >
+                <HightlightsForm />
+              </Form.Item>
+            </Col>
+            <Col span={24} key={22} >
+              <Form.Item
+                {...allLayout}
+                name={`financial_disclosure`}
+                label={`资产信息`}
+                rules={[
+                  {
+                    required: true,
+                    message: '资产信息必填!',
+                  },
+                ]}
+              >
+                <FinancialForm />
               </Form.Item>
             </Col>
           </Row>
           <Row>
-            <Space>
-              <Button type="primary" htmlType="submit">
-                提交
+            <div style={{ display: 'flex', justifyContent: 'center',width: '90%' }}>
+              <Space>
+                <Button type="primary" htmlType="submit">
+                  提交
             </Button>
-              <Button>
-                重置
+                <Button onClick={handleReset}>
+                  重置
             </Button>
-            </Space>
+              </Space>
+            </div>
           </Row>
         </Form>
       </Drawer>

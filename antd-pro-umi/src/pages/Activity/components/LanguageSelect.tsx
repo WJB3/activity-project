@@ -4,20 +4,19 @@ import { Select } from 'antd';
 const { Option } = Select;
  
 const statusList=[
-    {value:1,label:'准备募集'},
-    {value:2,label:'募集中'},
-    {value:3,label:'募集结束'},
+    {value:'cn',label:'中文'},
+    {value:'en',label:'英文'}, 
 ]
 
 
-const StatusSelect = (props: any) => {
+const LanguageSelect = (props: any) => {
  
 
-    const [value,setValue]=useState(1);
+    const [value,setValue]=useState('cn');
 
     useEffect(()=>{
         if(!props.value){
-            props.onChange(1);
+            props.onChange('cn');
         }
     },[props.value])
  
@@ -38,4 +37,4 @@ const StatusSelect = (props: any) => {
 
 }
 
-export default StatusSelect;
+export default LanguageSelect;

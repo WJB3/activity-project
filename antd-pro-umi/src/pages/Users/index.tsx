@@ -40,7 +40,7 @@ const TableList: React.FC = () => {
       key: 'email', 
     }, 
     {
-      status:'状态',
+      title:'状态',
       dataIndex:'status',
       render:(text:string)=>{
         if(text==='1'){

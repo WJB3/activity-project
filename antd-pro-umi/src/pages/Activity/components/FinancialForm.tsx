@@ -1,6 +1,6 @@
 //@ts-nocheck
 import React, { useState,useRef,useContext,useEffect } from 'react';
-import { Button, Table, Form,Input, message } from 'antd';
+import { Button, Table, Form,Input, message,InputNumber } from 'antd';
 const EditableContext = React.createContext(null);
 
 
@@ -22,6 +22,7 @@ const EditableCell = ({
     dataIndex,
     record,
     handleSave,
+    type,
     ...restProps
 }) => {
     console.log("EditableCell")
@@ -46,8 +47,8 @@ const EditableCell = ({
     };
 
     let childNode = children;
-
-    if (editable) {
+ 
+    if(type==='number'){
         childNode =  (
             <Form.Item
                 style={{ margin: 0 }}
@@ -59,7 +60,7 @@ const EditableCell = ({
                     },
                 ]}
             >
-                <Input ref={inputRef} onPressEnter={save} onBlur={save} />
+                <InputNumber ref={inputRef} onPressEnter={save} onBlur={save}   />
             </Form.Item>
         )  
     }
@@ -67,26 +68,21 @@ const EditableCell = ({
     return <td {...restProps}>{childNode}</td>;
 };
 
-const CompanyForm = (props: any) => {
+const FinancialForm = (props: any) => {
 
     const [dataSource, setDataSource] = useState([
-        {
-            key: 0,
-            name: '',
-            whereadress: '',
-            stockcode: '',
-            registeradress: '',
-            ratingagencies: '',
-            latestrating: '',
-            historyrating: '',
-        }
+        // {
+        //     key: 0, 
+        //     title:'',
+        //     content:''
+        // }
     ]);
 
     const handleDelete=(record)=>{
-        if(dataSource.length===1){
-            message.error('至少要传一个公司！')
-            return ;
-        }
+        // if(dataSource.length===1){
+        //     message.error('至少要传一个公司！')
+        //     return ;
+        // }
         const newData = [...dataSource];
         const index = newData.findIndex(item => record.key === item.key);
         newData.splice(index, 1);
@@ -96,42 +92,41 @@ const CompanyForm = (props: any) => {
 
     const [count,setCount]=useState(1);
 
+    const emptyObj={
+        year:'',total:'',liabilityratio:'',operatingactivities:'',operatingincome:'',netprofit:''
+    }
+
     const columns = [
         {
-            title: '公司名称',
-            dataIndex: 'name', 
-            editable: true,
-        },
-        {
-            title: '上市地点',
-            dataIndex: 'whereadress',
-            editable: true,
-        },
-        {
-            title: '股票代码',
-            dataIndex: 'stockcode',
-            editable: true,
+            title: '财务情况',
+            dataIndex: 'year', 
+            type: 'number',
         }, 
         {
-            title: '注册地址',
-            dataIndex: 'registeradress',
-            editable: true,
-        }, 
-        {
-            title: '评级机构',
-            dataIndex: 'ratingagencies',
-            editable: true,
+            title: '总资产',
+            dataIndex: 'total', 
+            type: 'number',
         },
         {
-            title: '最新评级',
-            dataIndex: 'latestrating',
-            editable: true,
-        }, 
+            title: '资产负债率',
+            dataIndex: 'liabilityratio', 
+            type: 'number',
+        },  
         {
-            title: '历史评级',
-            editable: true,
-            dataIndex: 'historyrating',
-        },   
+            title: '经营活动净现金流',
+            dataIndex: 'operatingactivities', 
+            type: 'number',
+        },  
+        {
+            title: '营业收入',
+            dataIndex: 'operatingincome', 
+            type: 'number',
+        },
+        {
+            title: '净利润',
+            dataIndex: 'netprofit', 
+            type: 'number',
+        },
         {
             title: '操作', 
             dataIndex: 'action',
@@ -163,13 +158,7 @@ const CompanyForm = (props: any) => {
     const handleAdd = () => { 
         const newData = {
           key: count,
-          name: '',
-          whereadress: '',
-          stockcode: '',
-          registeradress: '',
-          ratingagencies: '',
-          latestrating: '',
-          historyrating: '',
+          ...emptyObj
         };
         setDataSource([...dataSource, newData])
         props.onChange([...dataSource, newData])
@@ -185,6 +174,7 @@ const CompanyForm = (props: any) => {
                 editable: col.editable,
                 dataIndex: col.dataIndex,
                 title: col.title,
+                type:col.type,
                 handleSave: handleSave,
             }),
         };
@@ -194,7 +184,7 @@ const CompanyForm = (props: any) => {
     return (
         <div>
             <Button onClick={handleAdd} type="primary" style={{ marginBottom: 16 }}>
-                增加公司
+                增加财务情况
             </Button>
             <Table
                 components={components}
@@ -202,10 +192,11 @@ const CompanyForm = (props: any) => {
                 bordered
                 dataSource={dataSource}
                 columns={newColumns}
+                scroll={{ x: 1300 }}
             />
         </div>
     )
 
 }
 
-export default CompanyForm;
+export default FinancialForm;

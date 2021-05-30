@@ -22,6 +22,7 @@ const EditableCell = ({
     dataIndex,
     record,
     handleSave,
+    type,
     ...restProps
 }) => {
     console.log("EditableCell")
@@ -62,6 +63,21 @@ const EditableCell = ({
                 <Input ref={inputRef} onPressEnter={save} onBlur={save} />
             </Form.Item>
         )  
+    }else if(type==='textarea'){
+        childNode =  (
+            <Form.Item
+                style={{ margin: 0 }}
+                name={dataIndex}
+                rules={[
+                    {
+                        required: true,
+                        message: `${title}必填.`,
+                    },
+                ]}
+            >
+                <Input.TextArea autoSize ref={inputRef} onPressEnter={save} onBlur={save} autoSize={{ minRows: 3 }} />
+            </Form.Item>
+        )  
     }
 
     return <td {...restProps}>{childNode}</td>;
@@ -70,23 +86,18 @@ const EditableCell = ({
 const CompanyForm = (props: any) => {
 
     const [dataSource, setDataSource] = useState([
-        {
-            key: 0,
-            name: '',
-            whereadress: '',
-            stockcode: '',
-            registeradress: '',
-            ratingagencies: '',
-            latestrating: '',
-            historyrating: '',
-        }
+        // {
+        //     key: 0, 
+        //     title:'',
+        //     content:''
+        // }
     ]);
 
     const handleDelete=(record)=>{
-        if(dataSource.length===1){
-            message.error('至少要传一个公司！')
-            return ;
-        }
+        // if(dataSource.length===1){
+        //     message.error('至少要传一个公司！')
+        //     return ;
+        // }
         const newData = [...dataSource];
         const index = newData.findIndex(item => record.key === item.key);
         newData.splice(index, 1);
@@ -98,40 +109,15 @@ const CompanyForm = (props: any) => {
 
     const columns = [
         {
-            title: '公司名称',
-            dataIndex: 'name', 
+            title: '标题',
+            dataIndex: 'title', 
             editable: true,
         },
         {
-            title: '上市地点',
-            dataIndex: 'whereadress',
-            editable: true,
-        },
-        {
-            title: '股票代码',
-            dataIndex: 'stockcode',
-            editable: true,
+            title: '内容',
+            dataIndex: 'content', 
+            type:'textarea'
         }, 
-        {
-            title: '注册地址',
-            dataIndex: 'registeradress',
-            editable: true,
-        }, 
-        {
-            title: '评级机构',
-            dataIndex: 'ratingagencies',
-            editable: true,
-        },
-        {
-            title: '最新评级',
-            dataIndex: 'latestrating',
-            editable: true,
-        }, 
-        {
-            title: '历史评级',
-            editable: true,
-            dataIndex: 'historyrating',
-        },   
         {
             title: '操作', 
             dataIndex: 'action',
@@ -163,13 +149,8 @@ const CompanyForm = (props: any) => {
     const handleAdd = () => { 
         const newData = {
           key: count,
-          name: '',
-          whereadress: '',
-          stockcode: '',
-          registeradress: '',
-          ratingagencies: '',
-          latestrating: '',
-          historyrating: '',
+          title: '', 
+          content:''
         };
         setDataSource([...dataSource, newData])
         props.onChange([...dataSource, newData])
@@ -185,6 +166,7 @@ const CompanyForm = (props: any) => {
                 editable: col.editable,
                 dataIndex: col.dataIndex,
                 title: col.title,
+                type:col.type,
                 handleSave: handleSave,
             }),
         };
@@ -194,7 +176,7 @@ const CompanyForm = (props: any) => {
     return (
         <div>
             <Button onClick={handleAdd} type="primary" style={{ marginBottom: 16 }}>
-                增加公司
+                增加亮点
             </Button>
             <Table
                 components={components}

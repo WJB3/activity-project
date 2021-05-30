@@ -6,12 +6,26 @@ class ActivityService extends Service {
 
   //查询用户，如果不传参数默认所有用户
   async getActivity(){ 
-   
-    const { userId }=await this.ctx.service.users.getCurrent() 
-    const result = await this.app.mysql.select('activity',{
-      where: { userId }
-    }); 
-    return result;
+    const { userId,isadmin }=await this.ctx.service.users.getCurrent() 
+    const { pageSize,pageNum } = this.ctx.request.query;
+
+    let search={};
+    if(!isadmin){
+      search.userId=userId;
+    }
+
+    const query = {
+      offset: Number(pageNum) * Number(pageSize) - Number(pageSize),
+      limit: Number(pageSize),
+      ...search
+    };
+    const total=await this.app.mysql.select('activity',search);
+    const result = await this.app.mysql.select('activity',query); 
+    return {
+      total:total.length,
+      data:result
+    };
+     
   }
 
 }

@@ -4,20 +4,18 @@ import { Select } from 'antd';
 const { Option } = Select;
  
 const statusList=[
-    {value:1,label:'准备募集'},
-    {value:2,label:'募集中'},
-    {value:3,label:'募集结束'},
+    {value:'stock',label:'股权'},
+    {value:'debt',label:'债权'}, 
 ]
 
 
-const StatusSelect = (props: any) => {
- 
+const StockSelect = (props: any) => { 
 
-    const [value,setValue]=useState(1);
+    const [value,setValue]=useState('stock');
 
     useEffect(()=>{
         if(!props.value){
-            props.onChange(1);
+            props.onChange('stock');
         }
     },[props.value])
  
@@ -38,4 +36,4 @@ const StatusSelect = (props: any) => {
 
 }
 
-export default StatusSelect;
+export default StockSelect;

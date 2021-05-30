@@ -48,7 +48,7 @@ class CompanyService extends Service {
     if (!historyrating) { 
       return "历史评级必传";
     }
-    const result = await this.app.mysql.insert('company', params)
+    // const result = 
     //this.success("创建公司成功!")
   }
 

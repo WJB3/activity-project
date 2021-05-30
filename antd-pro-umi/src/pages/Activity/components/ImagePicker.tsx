@@ -35,7 +35,7 @@ const ImagePicker = (props: any) => {
 
     const handleChange = (info:any) => {
       
-        console.log("info",info.fileList[0].response)
+        console.log("info",info.fileList)
         if (info.file.status === 'uploading') {
             setLoading(true);
             return;

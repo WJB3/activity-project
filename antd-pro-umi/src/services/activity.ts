@@ -8,3 +8,15 @@ export async function add(data:any) {
     data:data
   });
 }
+
+export async function getList(params:any) {
+  return request(`${requestPrefix}/activity/list?${qs.stringify(params)}`, {
+    method: 'GET'
+  });
+}
+
+export async function deleteItem(id:string|number) {
+  return request(`${requestPrefix}/activity/${id}`, {
+    method: 'DELETE'
+  });
+}
