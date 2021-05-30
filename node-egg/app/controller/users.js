@@ -4,8 +4,8 @@ const Controller = require('../controller/base');
 const random = require('random')
 
 class UserController extends Controller {
-  async getList() { 
-    const user = await this.ctx.service.users.getUser(); 
+  async getList() {
+    const user = await this.ctx.service.users.getUser();
     this.success(user);
     return user;
   }
@@ -25,9 +25,9 @@ class UserController extends Controller {
       this.fail("手机号必传")
       return;
     }
-    const allUsers=await this.getList();
-    const user=allUsers.find(item=>item.phone===phone);
-    if(user){
+    const allUsers = await this.getList();
+    const user = allUsers.find(item => item.phone === phone);
+    if (user) {
       this.fail("该手机号已存在")
       return;
     }
@@ -61,6 +61,7 @@ class UserController extends Controller {
   }
 
   async get() {
+    console.log("get")
     const { ctx } = this;
     const { id } = ctx.params;
     if (!id) {
@@ -84,34 +85,34 @@ class UserController extends Controller {
       return;
     }
     const result = await this.app.mysql.update('users', {
-      id, 
+      id,
       ...ctx.request.body
     });
     if (result) {
       this.success('修改成功！')
     }
 
-  }
+  } 
 
-  async sendCode(){
+  async sendCode() {
     //1. 获取用户手机号
     const { phone } = this.ctx.request.body;
-    if(!phone){
+    if (!phone) {
       this.fail('手机号必填!');
-      return ;
+      return;
     }
     //2. 缓存中查询该手机号是否存在
     const sendCodePhone = await this.service.cache.get(`sendCode_${phone}`);
-    if(sendCodePhone){
+    if (sendCodePhone) {
       this.fail('您操作的太快了，验证码还未过期!');
-      return ;
+      return;
     }
     //3.生成随机四位验证码
-    const randomCode = random.int(1000,9999);
+    const randomCode = random.int(1000, 9999);
 
-    console.log("randomCode",randomCode)
+    console.log("randomCode", randomCode)
 
-     // 调试环境 不请求阿里服务器
+    // 调试环境 不请求阿里服务器
     if (!this.app.config.aliSMS.isopen) {
       await this._devCode(phone, randomCode);
     }
@@ -130,12 +131,16 @@ class UserController extends Controller {
   }
 
   //模拟发送短信验证码
-  async _devCode(phone,randomCode){
+  async _devCode(phone, randomCode) {
     this.ctx.service.cache.set(`sendCode_${phone}`, randomCode, this.app.config.aliSMS.expire);
     this.success('请求验证码成功!')
-    return ;
+    return;
   }
 
+  async current() { 
+    const { userInfo } = await this.ctx.service.users.getCurrent();
+    this.success(userInfo);
+  }
 }
 
 module.exports = UserController;

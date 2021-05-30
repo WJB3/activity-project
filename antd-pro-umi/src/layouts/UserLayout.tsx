@@ -6,6 +6,7 @@ import { Link, SelectLang, useIntl, connect, FormattedMessage } from 'umi';
 import React from 'react';
 import type { ConnectState } from '@/models/connect';
 import logo from '../assets/logo.svg';
+import block from '../assets/block.jpeg';
 import styles from './UserLayout.less';
 
 export type UserLayoutProps = {
@@ -48,20 +49,13 @@ const UserLayout: React.FC<UserLayoutProps> = (props) => {
           <div className={styles.top}>
             <div className={styles.header}>
               <Link to="/">
-                <img alt="logo" className={styles.logo} src={logo} />
-                <span className={styles.title}>Ant Design</span>
+                <img alt="logo" className={styles.logo} src={block} />
+                <span className={styles.title}>区块链活动管理系统</span>
               </Link>
-            </div>
-            <div className={styles.desc}>
-              <FormattedMessage
-                id="pages.layouts.userLayout.title"
-                defaultMessage="Ant Design. The most influential Web design specification in Xihu District."
-              />
-            </div>
+            </div> 
           </div>
           {children}
-        </div>
-        <DefaultFooter />
+        </div> 
       </div>
     </HelmetProvider>
   );

@@ -25,35 +25,19 @@
             routes: [
               {
                 path: '/',
-                redirect: '/welcome',
+                redirect: '/users',
               },
               {
-                path: '/welcome',
-                name: 'welcome',
-                icon: 'smile',
-                component: './Welcome',
-              },
+                path: '/users',
+                name: 'users',
+                icon: 'team',
+                component: './Users',
+              },  
               {
-                path: '/admin',
-                name: 'admin',
-                icon: 'crown',
-                component: './Admin',
-                authority: ['admin'],
-                routes: [
-                  {
-                    path: '/admin/sub-page',
-                    name: 'sub-page',
-                    icon: 'smile',
-                    component: './Welcome',
-                    authority: ['admin'],
-                  },
-                ],
-              },
-              {
-                name: 'list.table-list',
-                icon: 'table',
-                path: '/list',
-                component: './TableList',
+                name: 'activity',
+                icon: 'fire',
+                path: '/activity',
+                component: './Activity',
               },
               {
                 component: './404',

@@ -1,19 +1,23 @@
 import request from '@/utils/request';
+import { requestPrefix } from './config';
 
 export type LoginParamsType = {
-  userName: string;
-  password: string;
-  mobile: string;
-  captcha: string;
+  username: string;
+  password: string; 
 };
 
-export async function fakeAccountLogin(params: LoginParamsType) {
-  return request('/api/login/account', {
+//登陆接口
+export async function login(params: LoginParamsType) {
+  return request(`${requestPrefix}/login`, {
     method: 'POST',
     data: params,
   });
 }
 
-export async function getFakeCaptcha(mobile: string) {
-  return request(`/api/login/captcha?mobile=${mobile}`);
+export async function adminList() {
+  return request(`${requestPrefix}/admin/list`, {
+    method: 'GET', 
+  });
 }
+
+ 

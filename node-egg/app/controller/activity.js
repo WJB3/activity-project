@@ -1,8 +1,8 @@
 'use strict';
 
-const Controller = require('../controller/base');
-
-class UserController extends Controller {
+const Controller = require('../controller/base'); 
+ 
+class ActivityController extends Controller {
 
   async getList() { 
     const user = await this.ctx.service.activity.getActivity(); 
@@ -12,7 +12,7 @@ class UserController extends Controller {
 
   async create() {
     const { ctx } = this;
-    const { title, title_img } = ctx.request.body
+    const { title, title_img,highlights } = ctx.request.body
     if (!title) {
       this.fail("活动标题必传");
       return;
@@ -20,24 +20,41 @@ class UserController extends Controller {
     if (!title_img) {
       this.fail("活动图片必传")
       return;
-    } 
-    const token=ctx.get('Authorization').replace('Bearer ',""); 
+    }  
+    if(!highlights ||!highlights.length){
+      this.fail("公司必传")
+      return;
+    }
 
-    console.log("token",token)
-
-    const userId=await this.ctx.service.users.getCurrentUserId(token)
+    const { userId }=await this.ctx.service.users.getCurrent()
  
     if(!userId){
         this.fail("您的账号已失效，请重新登陆!");
         return ;
     }
     
+     
     const result = await this.app.mysql.insert('activity', { 
         title,
         title_img,
         userId
-    })
-    console.log("result", result)
+    })  
+
+    try{
+      highlights.forEach((company)=>{
+            const err=this.ctx.service.company.create({...company,activityId:result.id});
+            console.log("err",err);
+            if(err){
+              throw new Error(err); 
+            }
+      }) 
+    }catch(e){
+     console.log("catch",e.message)
+     this.fail(e.message);
+     return ;
+    }
+    
+
     this.success("创建活动成功!")
   }
 
@@ -48,12 +65,12 @@ class UserController extends Controller {
       this.fail("参数缺失！")
       return;
     }
-    const result = await this.app.mysql.get('users', { id });
+    const result = await this.app.mysql.get('activity', { id });
     if (!result) {
-      this.fail("该用户不存在！")
+      this.fail("该活动不存在！")
       return;
     }
-    await this.app.mysql.delete('users', {
+    await this.app.mysql.delete('activity', {
       id
     });
     this.success("删除成功")
@@ -93,4 +110,4 @@ class UserController extends Controller {
   }
 }
 
-module.exports = UserController;
+module.exports = ActivityController;

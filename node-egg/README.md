@@ -48,3 +48,5 @@ alter table activity add userId int
 
 # 第十三步：创建主外键关联关系
 alter table activity add foreign key(userId) references users(id);
+
+ 
