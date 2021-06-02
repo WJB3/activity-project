@@ -19,6 +19,9 @@ const StatusSelect = (props: any) => {
         if(!props.value){
             props.onChange(1);
         }
+        if(props.value){
+            setValue(Number(props.value))
+        }
     },[props.value])
  
     const handleChange=(value:any)=>{ 

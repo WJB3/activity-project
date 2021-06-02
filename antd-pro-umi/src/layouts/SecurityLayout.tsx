@@ -23,7 +23,7 @@ class SecurityLayout extends React.Component<SecurityLayoutProps, SecurityLayout
   render() { 
     const { children } = this.props; 
 
-    const isLogin=localStorage.getItem('isLogin');
+    const isLogin=sessionStorage.getItem('isLogin');
     
     if (!isLogin && window.location.pathname !== '/user/login') {
       return <Redirect to={`/user/login`} />;

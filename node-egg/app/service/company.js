@@ -19,6 +19,29 @@ class CompanyService extends Service {
     return result;
   }
 
+  async getHighlight(id) { 
+    let result;
+    if(!id){
+      result = null;
+    }else{
+      result = await this.app.mysql.select('highlights', {
+        where: { activityId:id }
+      });
+    }
+    return result;
+  }
+
+  async getFinance(id){
+    let result;
+    if(!id){
+      result = null;
+    }else{
+      result = await this.app.mysql.select('finance', {
+        where: { activityId:id }
+      });
+    }
+    return result;
+  }
  
 
   async create(params) {

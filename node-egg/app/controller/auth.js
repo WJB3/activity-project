@@ -34,16 +34,18 @@ class AuthController extends Controller {
             password: password
         }, this.app.config.jwt.secret);
 
+        let isAdmin;
         //普通会员登陆
         if(result){
             this.ctx.service.cache.set(token,result.id);
         }
 
         if(resultAdmin){
+            isAdmin=true;
             this.ctx.service.cache.set(token,`admin_${resultAdmin.id}`);
         } 
 
-        this.success({token})
+        this.success({token,isAdmin})
     }
 }
 

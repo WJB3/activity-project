@@ -12,6 +12,11 @@
             path: '/user/login',
             component: './User/login',
           },
+          {
+            name: 'register',
+            path: '/user/register',
+            component: './User/register',
+          },
         ],
       },
       {
@@ -24,8 +29,7 @@
             authority: ['admin', 'user'],
             routes: [
               {
-                path: '/',
-                redirect: '/users',
+                path: '/', 
               },
               {
                 path: '/users',

@@ -6,6 +6,7 @@ import {  Button } from 'antd';
 import React, { useEffect } from 'react';
 import ProForm, { ProFormText } from '@ant-design/pro-form';
 import { useIntl, connect, FormattedMessage } from 'umi'; 
+import { history } from 'umi';
 import type { Dispatch } from 'umi';
 import type { StateType } from '@/models/login';
 import type { LoginParamsType } from '@/services/login';
@@ -36,6 +37,12 @@ const Login: React.FC<LoginProps> = (props) => {
   useEffect(()=>{
   
   },[]);
+
+  const handleClickRegister=()=>{
+    history.replace({
+      pathname: '/user/register', 
+    })
+  }
 
   return (
     <div className={styles.main}>
@@ -104,7 +111,7 @@ const Login: React.FC<LoginProps> = (props) => {
           ]}
         /> 
       </ProForm> 
-      <Button type="default" block style={{marginTop:20}}>
+      <Button type="default" block style={{marginTop:20}} onClick={handleClickRegister}>
         注册
       </Button>
     </div>

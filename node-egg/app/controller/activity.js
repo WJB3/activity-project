@@ -13,7 +13,7 @@ class ActivityController extends Controller {
 
   async create() {
     const { ctx } = this;
-    const { title, title_img, highlights=[],financial_disclosure=[],sector,formstatus,content,company_logo,fundingTarget,underwrite,website,slogan,banner,overview } = ctx.request.body;
+    const { title, title_img, highlights=[],financial_disclosure=[],sector,formstatus,content,company_logo,fundingTarget,underwrite,website,slogan,banner,overview,language,type } = ctx.request.body;
     const allActivitys = await this.getList();
     const activity = allActivitys.data.find(item => item.title === title);
     if (activity) {
@@ -61,7 +61,9 @@ class ActivityController extends Controller {
       overview,
       underwrite,
       website,
-      company_logo
+      company_logo,
+      language,
+      type
     })
     
     try {
@@ -89,6 +91,97 @@ class ActivityController extends Controller {
           return ;
         }else{
           await this.app.mysql.insert('finance', { ...company, activityId: result.insertId })
+        } 
+      })
+    } catch (e) {
+      console.log("catch", e.message)  
+      return;
+    } 
+
+    this.success("创建活动成功!")
+  }
+
+  async edit() {
+    const { ctx } = this;
+    const { id,title, title_img, highlights=[],financial_disclosure=[],sector,formstatus,content,company_logo,fundingTarget,underwrite,website,slogan,banner,overview,language,type } = ctx.request.body;
+ 
+    if(!id){
+      this.fail("唯一标识必传")
+      return;
+    }
+    
+    if (!title) {
+      this.fail("活动标题必传");
+      return;
+    }
+    if (!title_img) {
+      this.fail("活动图片必传")
+      return;
+    }
+    if (!sector) {
+      this.fail("活动部门必传")
+      return;
+    }
+    if(!formstatus){
+      this.fail("募集状态必传")
+      return;
+    } 
+    if(financial_disclosure && !financial_disclosure.length){
+      this.fail("资金信息必传")
+      return;
+    }
+    const { userId } = await this.ctx.service.users.getCurrent()
+
+    if (!userId) {
+      this.fail("您的账号已失效，请重新登陆!");
+      return;
+    }
+ 
+    const result = await this.app.mysql.update('activity', {
+      id,
+      title,
+      title_img,
+      status:0,
+      sector,
+      userId,
+      formstatus,
+      content,
+      slogan,
+      fundingTarget,
+      banner,
+      overview,
+      underwrite,
+      website,
+      company_logo,
+      language,
+      type
+    })
+    
+    try {
+      highlights.forEach(async ({key,...company}) => {
+        const err = await this.ctx.service.highlights.create({ ...company, activityId: result.insertId });
+        console.log("err", err);
+        if (err) {  
+          this.fail(err);
+          return ;
+        }else{
+          await this.app.mysql.update('highlights', { ...company, activityId: result.insertId })
+        }
+      })
+    } catch (e) {
+      console.log("catch", e.message)  
+      return;
+    } 
+
+    try {
+      financial_disclosure.forEach(async ({key,...company}) => {
+        const err = await this.ctx.service.finance.create({ ...company, activityId: result.insertId });
+        console.log("err", err);
+        if (err) {  
+          this.fail(err);
+          return ;
+        }else{
+          await this.app.mysql.update('finance', { ...company, activityId: result.insertId })
         } 
       })
     } catch (e) {
@@ -132,23 +225,7 @@ class ActivityController extends Controller {
     this.success(result);
     return result;
   }
-
-  async edit() {
-    const { ctx } = this;
-    const { id } = ctx.request.body
-    if (!id) {
-      this.fail("参数缺失！")
-      return;
-    }
-    const result = await this.app.mysql.update('users', {
-      id,
-      ...ctx.request.body
-    });
-    if (result) {
-      this.success('修改成功！')
-    }
-
-  }
+ 
 }
 
 module.exports = ActivityController;

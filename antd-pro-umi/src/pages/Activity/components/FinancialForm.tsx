@@ -24,18 +24,9 @@ const EditableCell = ({
     handleSave,
     type,
     ...restProps
-}) => {
-    console.log("EditableCell")
-    const [editing, setEditing] = useState(false);
+}) => { 
     const inputRef = useRef(null);
-    const form = useContext(EditableContext)!;
-
- 
-
-    const toggleEdit = () => {
-        setEditing(!editing);
-        form.setFieldsValue({ [dataIndex]: record[dataIndex] });
-    };
+    const form = useContext(EditableContext)!; 
 
     const save = async () => {
         try {
@@ -45,6 +36,12 @@ const EditableCell = ({
             console.log('Save failed:', errInfo);
         }
     };
+
+    if(record?.[dataIndex]){
+        form.setFieldsValue({
+            [dataIndex]:record[dataIndex]
+        })
+    }
 
     let childNode = children;
  
@@ -60,7 +57,7 @@ const EditableCell = ({
                     },
                 ]}
             >
-                <InputNumber ref={inputRef} onPressEnter={save} onBlur={save}   />
+                <InputNumber ref={inputRef} onPressEnter={save} onBlur={save}  />
             </Form.Item>
         )  
     }
@@ -77,6 +74,10 @@ const FinancialForm = (props: any) => {
         //     content:''
         // }
     ]);
+
+    useEffect(()=>{
+        setDataSource((props.value||[]))
+    },props.value)
 
     const handleDelete=(record)=>{
         // if(dataSource.length===1){
@@ -180,6 +181,7 @@ const FinancialForm = (props: any) => {
         };
     });
  
+    console.log("dataSource",dataSource)
 
     return (
         <div>

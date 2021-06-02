@@ -21,12 +21,12 @@ class UserController extends Controller {
       this.fail("密码必传必传")
       return;
     }
-    if (!phone) {
-      this.fail("手机号必传")
-      return;
-    }
-    const allUsers = await this.getList();
-    const user = allUsers.find(item => item.phone === phone);
+    // if (!phone) {
+    //   this.fail("手机号必传")
+    //   return;
+    // }
+    const allUsers = await this.getList(); 
+    const user = (allUsers.data || []).find(item => item.phone === phone);
     if (user) {
       this.fail("该手机号已存在")
       return;

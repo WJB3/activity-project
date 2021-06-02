@@ -4,6 +4,7 @@ import { requestPrefix } from './config';
 export type LoginParamsType = {
   username: string;
   password: string; 
+  password2?:string;
 };
 
 //登陆接口

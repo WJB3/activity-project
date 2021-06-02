@@ -1,13 +1,13 @@
- 
+
 import type {
   MenuDataItem,
   BasicLayoutProps as ProLayoutProps,
   Settings,
 } from '@ant-design/pro-layout';
 import ProLayout from '@ant-design/pro-layout';
-import React, {  useMemo, useRef } from 'react';
+import React, { useEffect, useMemo, useRef } from 'react';
 import type { Dispatch } from 'umi';
-import { Link, useIntl, connect, history } from 'umi'; 
+import { Link, useIntl, connect, history, useLocation } from 'umi';
 import { Result, Button } from 'antd';
 import Authorized from '@/utils/Authorized';
 import RightContent from '@/components/GlobalHeader/RightContent';
@@ -41,15 +41,24 @@ export type BasicLayoutContext = { [K in 'location']: BasicLayoutProps[K] } & {
 };
 /** Use Authorized check all menu item */
 
-const menuDataRender = (menuList: MenuDataItem[]): MenuDataItem[] =>
-  menuList.map((item) => {
+const menuDataRender = (menuList: MenuDataItem[]): MenuDataItem[] => {
+
+  let newMenuList=menuList;
+
+  if(sessionStorage.getItem('IS_ADMIN')){ 
+  }else{
+    newMenuList.splice(1,1)
+  }
+ 
+  return newMenuList.map((item) => {
     const localItem = {
       ...item,
       children: item.children ? menuDataRender(item.children) : undefined,
     };
     return Authorized.check(item.authority, localItem, null) as MenuDataItem;
-  });
- 
+  })
+};
+
 const BasicLayout: React.FC<BasicLayoutProps> = (props) => {
   const {
     dispatch,
@@ -61,7 +70,16 @@ const BasicLayout: React.FC<BasicLayoutProps> = (props) => {
   } = props;
 
   const menuDataRef = useRef<MenuDataItem[]>([]);
- 
+
+  useEffect(() => {
+    console.log("location", location)
+    if (sessionStorage.getItem("IS_ADMIN")) {
+      history.replace('/users')
+    } else {
+      history.replace('/activity')
+    }
+  }, [])
+
 
   const handleMenuCollapse = (payload: boolean): void => {
     if (dispatch) {
@@ -80,7 +98,7 @@ const BasicLayout: React.FC<BasicLayoutProps> = (props) => {
     [location.pathname],
   );
 
-  const { formatMessage } = useIntl(); 
+  const { formatMessage } = useIntl();
 
   return (
     <ProLayout
@@ -116,7 +134,7 @@ const BasicLayout: React.FC<BasicLayoutProps> = (props) => {
         ) : (
           <span>{route.breadcrumbName}</span>
         );
-      }} 
+      }}
       menuDataRender={menuDataRender}
       rightContentRender={() => <RightContent />}
       postMenuData={(menuData) => {

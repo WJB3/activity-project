@@ -29,14 +29,20 @@ class UserService extends Service {
 
   async getCurrent(){ 
     const userId=await this.getCurrentUserId();
+    console.log("userId",userId)
     let result;
     let isadmin=false;
     //是管理员
     if(String(userId).indexOf('admin_')>-1){
-      result = await this.app.mysql.select('admin',{id:userId}); 
+      result = await this.app.mysql.select('admin',{
+        where: { id:userId.replace("admin_","") }}
+      ); 
+      console.log("result",result)
       isadmin=true;
     }else{
-      result = await this.app.mysql.select('users',{id:userId}); 
+      result = await this.app.mysql.select('users',{
+        where: { id:userId }
+      }); 
     }
     return {
       isadmin,

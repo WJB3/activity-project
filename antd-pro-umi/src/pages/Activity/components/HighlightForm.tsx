@@ -30,7 +30,11 @@ const EditableCell = ({
     const inputRef = useRef(null);
     const form = useContext(EditableContext)!;
 
- 
+    if(record?.[dataIndex]){
+        form.setFieldsValue({
+            [dataIndex]:record[dataIndex]
+        })
+    }
 
     const toggleEdit = () => {
         setEditing(!editing);
@@ -106,6 +110,10 @@ const CompanyForm = (props: any) => {
     }
 
     const [count,setCount]=useState(1);
+
+    useEffect(()=>{
+        setDataSource((props.value||[]))
+    },props.value)
 
     const columns = [
         {

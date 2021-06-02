@@ -39,8 +39,11 @@ const Model: LoginModelType = {
         // Login successfully
         if (response) { 
           message.success('🎉 🎉 🎉  登录成功！');  
-          localStorage.setItem('isLogin','true');
-          localStorage.setItem('TOKEN',response.token);
+          sessionStorage.setItem('isLogin','true');
+          sessionStorage.setItem('TOKEN',response.token);
+          if(response.isAdmin){
+            sessionStorage.setItem('IS_ADMIN','TRUE')
+          } 
           window.location.href = '/'; 
         }
       }catch(e){
@@ -51,7 +54,7 @@ const Model: LoginModelType = {
     logout() {
       const { redirect } = getPageQuery();
       // Note: There may be security issues, please note
-      localStorage.clear(); 
+      sessionStorage.clear(); 
       if (window.location.pathname !== '/user/login' && !redirect) {
         history.replace({
           pathname: '/user/login',

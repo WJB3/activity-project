@@ -8,7 +8,7 @@ import StatusSelect from './components/StatusSelect';
 import LanguageSelect from './components/LanguageSelect';
 import StockSelect from './components/StockSelect'
 import FinancialForm from './components/FinancialForm'
-import { add, getList, deleteItem } from '@/services/activity';
+import { add, getList, deleteItem,getHighlight,getFinance ,edit} from '@/services/activity';
 
 const layout = {
   labelCol: { span: 6 },
@@ -28,6 +28,8 @@ const TableList: React.FC = () => {
   const [_, forceUpdate] = useState([]);
 
   const [loading, setLoading] = useState(false);
+
+  const [current,setCurrent]=useState({});
 
   const [formVisible, setFormVisible] = useState(false);
 
@@ -51,6 +53,40 @@ const TableList: React.FC = () => {
     deleteItem(record.id).then(res => {
       message.success('活动删除成功！');
       forceUpdate([]);
+    })
+  }
+
+  //编辑
+  const handleEdit=(record:any)=>{
+    setCurrent(record)
+    getHighlight(record.id).then(res=>{
+      console.log("getHighlight",res)
+      form.setFieldsValue({
+        highlights:res
+      })
+    })
+    getFinance(record.id).then(res=>{
+      console.log("getFinance",res)
+      form.setFieldsValue({
+        financial_disclosure:res
+      })
+    })
+    console.log("record",record);
+    setFormVisible(true)
+    form.setFieldsValue({
+      title:record.title,
+      title_img:record.title_img,
+      sector:record.sector,
+      formstatus:record.formstatus,
+      content:record.content,
+      fundingTarget:record.fundingTarget,
+      slogan:record.slogan,
+      banner:record.banner,
+      overview:record.overview,
+      underwrite:record.underwrite,
+      website:record.website,
+      company_logo:record.company_logo,
+   
     })
   }
 
@@ -150,6 +186,7 @@ const TableList: React.FC = () => {
       render: (text: string, record) => {
         return (
           <Space>
+            <Button type="primary" size={"small"} onClick={(e)=>handleEdit(record)}>编辑</Button>
             <Popconfirm
               title="确定要删除此活动吗，删除后不可恢复?"
               onConfirm={() => handleDelete(record)}
@@ -165,10 +202,12 @@ const TableList: React.FC = () => {
   ];
 
   const handleAdd = () => {
+    setCurrent({})
     setFormVisible(true);
   }
 
   const handleClose = () => {
+    setCurrent({})
     setFormVisible(false);
   }
 
@@ -190,12 +229,22 @@ const TableList: React.FC = () => {
 
   const onFinish = (values: any) => {
     console.log("onFinish", values)
-    add(values).then(res => {
-      message.success('创建任务成功');
-      form.resetFields();
-      forceUpdate([]);
-      setFormVisible(false);
-    })
+    if((current as any).id){
+      edit({...values,id:(current as any).id}).then(res => {
+        message.success('创建任务成功');
+        form.resetFields();
+        forceUpdate([]);
+        setFormVisible(false);
+      })
+    }else{
+      add(values).then(res => {
+        message.success('编辑任务成功');
+        form.resetFields();
+        forceUpdate([]);
+        setFormVisible(false);
+      })
+    }
+    
   }
 
   return (
@@ -212,7 +261,7 @@ const TableList: React.FC = () => {
         loading={loading}
       />
       <Drawer
-        title="增加活动"
+        title={(current as any).id?"编辑活动":"增加活动"}
         placement="right"
         visible={formVisible}
         onClose={handleClose}
@@ -296,7 +345,7 @@ const TableList: React.FC = () => {
                   },
                 ]}
               >
-                <Input.TextArea placeholder={"请输入活动内容"} autoSize={{ minRows: 3 }} />
+                <Input.TextArea placeholder={"请输入活动内容"} rows={4}   />
               </Form.Item>
             </Col>
             <Col span={6} key={5}>
@@ -324,7 +373,7 @@ const TableList: React.FC = () => {
                   },
                 ]}
               >
-                <Input.TextArea placeholder={"请输入活动口号"} autoSize={{ minRows: 3 }} />
+                <Input.TextArea placeholder={"请输入活动口号"} rows={4}   />
               </Form.Item>
             </Col>
             <Col span={6} key={7}>
@@ -352,7 +401,7 @@ const TableList: React.FC = () => {
                   },
                 ]}
               >
-                <Input.TextArea placeholder={"请输入活动口号"} autoSize={{ minRows: 3 }} />
+                <Input.TextArea placeholder={"请输入活动口号"} rows={4}  />
               </Form.Item>
             </Col>
             <Col span={6} key={9}>

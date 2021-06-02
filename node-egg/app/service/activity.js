@@ -16,11 +16,15 @@ class ActivityService extends Service {
 
     const query = {
       offset: Number(pageNum) * Number(pageSize) - Number(pageSize),
-      limit: Number(pageSize),
-      ...search
+      limit: Number(pageSize), 
     };
-    const total=await this.app.mysql.select('activity',search);
-    const result = await this.app.mysql.select('activity',query); 
+    const total=await this.app.mysql.select('activity',{
+      where:{...search}
+    });
+    const result = await this.app.mysql.select('activity',{
+      query,
+      where:{...search}
+    }); 
     return {
       total:total.length,
       data:result

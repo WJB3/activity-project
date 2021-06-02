@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { LoadingOutlined, PlusOutlined } from '@ant-design/icons';
 import { Upload, message } from 'antd';
 
@@ -26,6 +26,10 @@ const ImagePicker = (props: any) => {
     const {
 
     } = props;
+
+    useEffect(()=>{
+        setImageUrl(props.value)
+    },props.value)
 
     const [imageUrl, setImageUrl] = useState('');
 

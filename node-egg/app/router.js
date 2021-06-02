@@ -27,6 +27,8 @@ module.exports = app => {
 
   //创建活动接口
   router.post('/activity',jwt,controller.activity.create)
+  //编辑活动接口
+  router.put('/activity',jwt,controller.activity.edit)
   //活动列表接口
   router.get('/activity/list', jwt,controller.activity.getList);
   //删除活动
@@ -41,4 +43,10 @@ module.exports = app => {
   //router.post('/company',jwt,controller.company.create)
   //查看公司
   router.get('/company/list',jwt,controller.company.getList);
+
+  //查看活动id对应的highlight
+  router.get('/highlight/:id',jwt,controller.company.getHighlight);
+
+  //查看活动id对应的finiance
+  router.get('/finance/:id',jwt,controller.company.getFinance);
 };

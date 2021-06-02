@@ -10,6 +10,17 @@ class CompanyController extends Controller {
         return company;
   }
 
+  async getHighlight(){
+    const { id } =this.ctx.params;
+    const highlights = await this.ctx.service.company.getHighlight(id); 
+    this.success(highlights);
+  }
+
+  async getFinance(){
+    const { id } = this.ctx.params;
+    const finance = await this.ctx.service.company.getFinance(id); 
+    this.success(finance);
+  }
    
  
 }
