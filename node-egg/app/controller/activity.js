@@ -101,6 +101,20 @@ class ActivityController extends Controller {
     this.success("创建活动成功!")
   }
 
+  async audit(){
+    const { ctx } = this;
+    const { id } = ctx.request.body;
+    if(!id){
+      this.fail("唯一标识必传")
+      return;
+    }
+    await this.app.mysql.update('activity', {
+      id,
+      status:"1"
+    })
+    this.success("审核活动成功!")
+  }
+
   async edit() {
     const { ctx } = this;
     const { id,title, title_img, highlights=[],financial_disclosure=[],sector,formstatus,content,company_logo,fundingTarget,underwrite,website,slogan,banner,overview,language,type } = ctx.request.body;
@@ -141,7 +155,7 @@ class ActivityController extends Controller {
       id,
       title,
       title_img,
-      status:0,
+      status:"0",
       sector,
       userId,
       formstatus,
@@ -159,13 +173,18 @@ class ActivityController extends Controller {
     
     try {
       highlights.forEach(async ({key,...company}) => {
-        const err = await this.ctx.service.highlights.create({ ...company, activityId: result.insertId });
+        const err = await this.ctx.service.highlights.create({ ...company });
         console.log("err", err);
         if (err) {  
           this.fail(err);
           return ;
         }else{
-          await this.app.mysql.update('highlights', { ...company, activityId: result.insertId })
+          if(company.id){
+            await this.app.mysql.update('highlights', { ...company })
+          }else{
+            await this.app.mysql.insert('highlights', { ...company, activityId: id })
+          }
+          
         }
       })
     } catch (e) {
@@ -173,15 +192,20 @@ class ActivityController extends Controller {
       return;
     } 
 
-    try {
+    try { 
       financial_disclosure.forEach(async ({key,...company}) => {
-        const err = await this.ctx.service.finance.create({ ...company, activityId: result.insertId });
+        const err = await this.ctx.service.finance.create({ ...company });
         console.log("err", err);
         if (err) {  
           this.fail(err);
           return ;
         }else{
-          await this.app.mysql.update('finance', { ...company, activityId: result.insertId })
+          if(company.id){
+            await this.app.mysql.update('finance', { ...company  })
+          }else{
+            await this.app.mysql.insert('finance', { ...company, activityId:id })
+          }
+         
         } 
       })
     } catch (e) {
@@ -204,8 +228,9 @@ class ActivityController extends Controller {
       this.fail("该活动不存在！")
       return;
     }
-    await this.app.mysql.delete('activity', {
-      id
+    await this.app.mysql.update('activity', {
+      id,
+      status:"-1"
     });
     this.success("删除成功")
   }

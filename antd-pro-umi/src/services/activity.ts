@@ -40,3 +40,10 @@ export async function getFinance(id:string|number) {
     method: 'GET'
   });
 }
+
+export async function audit(params:any) {
+  return request(`${requestPrefix}/activity/audit`,{
+    method:'PUT',
+    data:params
+  })
+}

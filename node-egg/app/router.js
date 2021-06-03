@@ -33,6 +33,8 @@ module.exports = app => {
   router.get('/activity/list', jwt,controller.activity.getList);
   //删除活动
   router.delete('/activity/:id',jwt,controller.activity.delete);
+  //审核活动
+  router.put('/activity/audit',jwt,controller.activity.audit)
 
   //管理员注册
   router.post('/admin',controller.admin.create);

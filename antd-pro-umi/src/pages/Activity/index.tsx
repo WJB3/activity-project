@@ -1,6 +1,6 @@
 
 import React, { useEffect, useRef, useState } from 'react';
-import { Table, Tag, Input, Popconfirm, Card, Button, Drawer, InputNumber, Form, Row, Col, Image, Space, message, } from 'antd';
+import { Table, Tag, Input,Modal, Popconfirm, Card, Button, Drawer, InputNumber, Form, Row, Col, Image, Space, message, } from 'antd';
 import { PageContainer } from '@ant-design/pro-layout';
 import ImagePicker from './components/ImagePicker';
 import HightlightsForm from './components/HighlightForm';
@@ -8,7 +8,10 @@ import StatusSelect from './components/StatusSelect';
 import LanguageSelect from './components/LanguageSelect';
 import StockSelect from './components/StockSelect'
 import FinancialForm from './components/FinancialForm'
-import { add, getList, deleteItem,getHighlight,getFinance ,edit} from '@/services/activity';
+import { add, getList, deleteItem,getHighlight,getFinance ,edit,audit} from '@/services/activity';
+import { ExclamationCircleOutlined } from '@ant-design/icons';
+
+const { confirm } = Modal;
 
 const layout = {
   labelCol: { span: 6 },
@@ -51,9 +54,26 @@ const TableList: React.FC = () => {
 
   const handleDelete = (record: any) => {
     deleteItem(record.id).then(res => {
-      message.success('活动删除成功！');
+      message.success('活动下架成功！');
       forceUpdate([]);
     })
+  }
+
+  const handleAudit=(record:any)=>{
+    setCurrent(record)
+    confirm({
+      title: '确定审核这个活动吗?',
+      icon: <ExclamationCircleOutlined />, 
+      onOk() {
+        return audit({id:(record as any).id}).then((res)=>{
+          message.success("活动审核成功！")
+          forceUpdate([]);
+        })
+      },
+      onCancel() {
+       
+      },
+    });
   }
 
   //编辑
@@ -169,7 +189,7 @@ const TableList: React.FC = () => {
         if (text == 0) {
           return <Tag color="warning">{'待审核'}</Tag>
         } else if (text == 1) {
-          return <Tag color="warning">{'审核通过'}</Tag>
+          return <Tag color="success">{'审核通过'}</Tag>
         } else {
           return <Tag color="error">{'异常'}</Tag>
         }
@@ -187,13 +207,14 @@ const TableList: React.FC = () => {
         return (
           <Space>
             <Button type="primary" size={"small"} onClick={(e)=>handleEdit(record)}>编辑</Button>
+            {sessionStorage.getItem('IS_ADMIN') && <Button type="primary" size={"small"} onClick={(e)=>handleAudit(record)}>审核</Button>}
             <Popconfirm
-              title="确定要删除此活动吗，删除后不可恢复?"
+              title="确定要下架此活动吗，下架后不可恢复?"
               onConfirm={() => handleDelete(record)}
               okText="确定"
               cancelText="取消"
             >
-              <Button danger size={"small"} >删除</Button>
+              <Button danger size={"small"} >下架</Button>
             </Popconfirm>
           </Space>
         )
@@ -229,7 +250,7 @@ const TableList: React.FC = () => {
 
   const onFinish = (values: any) => {
     console.log("onFinish", values)
-    if((current as any).id){
+    if((current as any).id){ 
       edit({...values,id:(current as any).id}).then(res => {
         message.success('创建任务成功');
         form.resetFields();
@@ -488,7 +509,7 @@ const TableList: React.FC = () => {
               >
                 <HightlightsForm />
               </Form.Item>
-            </Col>
+            </Col>  
             <Col span={24} key={22} >
               <Form.Item
                 {...allLayout}

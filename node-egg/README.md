@@ -22,7 +22,7 @@ show create table admin
 
 create table users(id int(11) primary key auto_increment,username varchar(255),password varchar(255),email varchar(255),phone varchar(255),status varchar(255));
 
-# 第七步：创建活动表(活动标题，标题图片，活动部门，活动状态，活动内容，融资目标，活动口号，活动横幅，活动概述，活动承销，公司网站，公司logo,财务信息披露,活动类型 stock-股权 debt-债权，语言)
+# 第七步：创建活动表(活动标题，标题图片，活动部门，活动状态0表示未审核 1表示已审核 -1表示已下架，活动内容，融资目标，活动口号，活动横幅，活动概述，活动承销，公司网站，公司logo,财务信息披露,活动类型 stock-股权 debt-债权，语言)
 
 create table activity(id int(11) primary key auto_increment,title varchar(255),title_img varchar(255),sector varchar(255),status varchar(255),content varchar(255),
 fundingTarget varchar(255),slogan varchar(255),banner varchar(255),overview varchar(255),underwrite varchar(255),website varchar(255),company_logo varchar(255),

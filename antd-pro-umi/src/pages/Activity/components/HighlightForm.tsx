@@ -111,9 +111,9 @@ const CompanyForm = (props: any) => {
 
     const [count,setCount]=useState(1);
 
-    useEffect(()=>{
-        setDataSource((props.value||[]))
-    },props.value)
+    useEffect(()=>{ 
+        setDataSource((props.value||[])) 
+    },[props.value])
 
     const columns = [
         {
@@ -178,8 +178,7 @@ const CompanyForm = (props: any) => {
                 handleSave: handleSave,
             }),
         };
-    });
- 
+    }); 
 
     return (
         <div>

@@ -77,7 +77,7 @@ const FinancialForm = (props: any) => {
 
     useEffect(()=>{
         setDataSource((props.value||[]))
-    },props.value)
+    },[props.value])
 
     const handleDelete=(record)=>{
         // if(dataSource.length===1){

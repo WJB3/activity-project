@@ -29,7 +29,7 @@ const ImagePicker = (props: any) => {
 
     useEffect(()=>{
         setImageUrl(props.value)
-    },props.value)
+    },[props.value])
 
     const [imageUrl, setImageUrl] = useState('');
 
@@ -38,8 +38,7 @@ const ImagePicker = (props: any) => {
     const [loading, setLoading] = useState(false);
 
     const handleChange = (info:any) => {
-      
-        console.log("info",info.fileList)
+       
         if (info.file.status === 'uploading') {
             setLoading(true);
             return;
