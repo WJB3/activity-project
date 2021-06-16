@@ -1,6 +1,6 @@
-
+//@ts-nocheck
 import React, { useEffect, useRef, useState } from 'react';
-import { Table, Tag, Input,Modal, Popconfirm, Card, Button, Drawer, InputNumber, Form, Row, Col, Image, Space, message, } from 'antd';
+import { Table, Tag, Input, Modal, Popconfirm, Card, Button, Drawer, InputNumber, Form, Row, Col, Image, Space, message, } from 'antd';
 import { PageContainer } from '@ant-design/pro-layout';
 import ImagePicker from './components/ImagePicker';
 import HightlightsForm from './components/HighlightForm';
@@ -8,8 +8,11 @@ import StatusSelect from './components/StatusSelect';
 import LanguageSelect from './components/LanguageSelect';
 import StockSelect from './components/StockSelect'
 import FinancialForm from './components/FinancialForm'
-import { add, getList, deleteItem,getHighlight,getFinance ,edit,audit} from '@/services/activity';
+import { add, getList, deleteItem, getHighlight, getFinance, edit, audit } from '@/services/activity';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
+import isMobile from '@/utils/isMobile';
+import { requestPrefix, requestPrefixImage } from '@/services/config'
+import "./index.less"
 
 const { confirm } = Modal;
 
@@ -19,9 +22,11 @@ const layout = {
 };
 
 const allLayout = {
-  labelCol: { span: 1 },
+  labelCol: { span: 2 },
   wrapperCol: { span: 22 },
 }
+
+let isadmin = sessionStorage.getItem("IS_ADMIN");
 
 
 const TableList: React.FC = () => {
@@ -32,7 +37,7 @@ const TableList: React.FC = () => {
 
   const [loading, setLoading] = useState(false);
 
-  const [current,setCurrent]=useState({});
+  const [current, setCurrent] = useState({});
 
   const [formVisible, setFormVisible] = useState(false);
 
@@ -48,7 +53,7 @@ const TableList: React.FC = () => {
     setPagination(pagination)
   }
 
-  const handleReset=()=>{
+  const handleReset = () => {
     form.resetFields();
   }
 
@@ -59,58 +64,58 @@ const TableList: React.FC = () => {
     })
   }
 
-  const handleAudit=(record:any)=>{
+  const handleAudit = (record: any) => {
     setCurrent(record)
     confirm({
       title: '确定审核这个活动吗?',
-      icon: <ExclamationCircleOutlined />, 
+      icon: <ExclamationCircleOutlined />,
       onOk() {
-        return audit({id:(record as any).id}).then((res)=>{
+        return audit({ id: (record as any).id }).then((res) => {
           message.success("活动审核成功！")
           forceUpdate([]);
         })
       },
       onCancel() {
-       
+
       },
     });
   }
 
   //编辑
-  const handleEdit=(record:any)=>{
+  const handleEdit = (record: any) => {
     setCurrent(record)
-    getHighlight(record.id).then(res=>{
-      console.log("getHighlight",res)
+    getHighlight(record.id).then(res => {
+      console.log("getHighlight", res)
       form.setFieldsValue({
-        highlights:res
+        highlights: res
       })
     })
-    getFinance(record.id).then(res=>{
-      console.log("getFinance",res)
+    getFinance(record.id).then(res => {
+      console.log("getFinance", res)
       form.setFieldsValue({
-        financial_disclosure:res
+        financial_disclosure: res
       })
     })
-    console.log("record",record);
+    console.log("record", record);
     setFormVisible(true)
     form.setFieldsValue({
-      title:record.title,
-      title_img:record.title_img,
-      sector:record.sector,
-      formstatus:record.formstatus,
-      content:record.content,
-      fundingTarget:record.fundingTarget,
-      slogan:record.slogan,
-      banner:record.banner,
-      overview:record.overview,
-      underwrite:record.underwrite,
-      website:record.website,
-      company_logo:record.company_logo,
-   
+      title: record.title,
+      title_img: `${requestPrefixImage}${record.title_img}`,
+      sector: record.sector,
+      formstatus: record.formstatus,
+      content: record.content,
+      fundingTarget: record.fundingTarget,
+      slogan: record.slogan,
+      banner: `${requestPrefixImage}${record.banner}`,
+      overview: record.overview,
+      underwrite: record.underwrite,
+      website: record.website,
+      company_logo: `${requestPrefixImage}${record.company_logo}`,
+      language: record.language
     })
   }
 
-  const columns = [
+  let columns = [
     {
       title: '活动名称',
       dataIndex: 'title',
@@ -121,7 +126,7 @@ const TableList: React.FC = () => {
       dataIndex: 'title_img',
       key: 'title_img',
       render: (text: any) => {
-        return <Image src={text} width={100} height={100} />
+        return <Image src={`${requestPrefixImage}${text}`} width={100} height={100} />
       }
     },
     {
@@ -145,7 +150,19 @@ const TableList: React.FC = () => {
         }
       }
     },
-
+    {
+      title: '语言',
+      dataIndex: 'language',
+      render: (text: string | number) => {
+        if (text == 'cn') {
+          return <Tag color="blue">{'中文'}</Tag>
+        } else if (text == 'en') {
+          return <Tag color='warning'>{'英文'}</Tag>
+        } else {
+          return <><Tag color="blue">{'中文'}</Tag><Tag color="warning">{'英文'}</Tag></>
+        }
+      }
+    },
     {
       title: '活动内容',
       dataIndex: 'content',
@@ -161,7 +178,7 @@ const TableList: React.FC = () => {
       dataIndex: 'banner',
       key: 'banner',
       render: (text: any) => {
-        return <Image src={text} width={100} height={100} />
+        return <Image src={`${requestPrefixImage}${text}`} width={100} height={100} />
       }
     },
     {
@@ -179,7 +196,7 @@ const TableList: React.FC = () => {
       dataIndex: 'company_logo',
       key: 'company_logo',
       render: (text: any) => {
-        return <Image src={text} width={100} height={100} />
+        return <Image src={`${requestPrefixImage}${text}`} width={100} height={100} />
       }
     },
     {
@@ -195,19 +212,14 @@ const TableList: React.FC = () => {
         }
       }
     },
-    // {
-    //   title: '活动口号',
-    //   dataIndex: 'slogan',
-    //   key: 'slogan',
-    // },
     {
-      status: '操作',
+      title: '操作',
       dataIndex: 'action',
       render: (text: string, record) => {
         return (
           <Space>
-            <Button type="primary" size={"small"} onClick={(e)=>handleEdit(record)}>编辑</Button>
-            {sessionStorage.getItem('IS_ADMIN') && <Button type="primary" size={"small"} onClick={(e)=>handleAudit(record)}>审核</Button>}
+            <Button type="primary" size={"small"} onClick={(e) => handleEdit(record)}>编辑</Button>
+            {isadmin && <Button type="primary" size={"small"} onClick={(e) => handleAudit(record)}>审核</Button>}
             <Popconfirm
               title="确定要下架此活动吗，下架后不可恢复?"
               onConfirm={() => handleDelete(record)}
@@ -222,6 +234,100 @@ const TableList: React.FC = () => {
     }
   ];
 
+  if (isMobile()) {
+    columns = [
+      {
+        title: '活动名称',
+        dataIndex: 'title',
+        className: 'styletitle',
+        key: 'title',
+        render: (text) => {
+          return <div style={{ width: 30 }}>
+            {text}
+          </div>
+        }
+      },
+      {
+        title: '语言',
+        dataIndex: 'language',
+        className: 'styletitle',
+        render: (text: string | number) => {
+          if (text == 'cn') {
+            return '中文'
+          } else if (text == 'en') {
+            return '英文'
+          } else {
+            return <div>{'中文、英文'}</div>
+          }
+        }
+      },
+      {
+        title: '募集状态',
+        dataIndex: 'formstatus',
+        className: 'styletitle',
+        render: (text: string | number) => {
+          console.log("text", text)
+          if (text == 1) {
+            return '准备募集'
+          } else if (text == 2) {
+            return '募集中'
+          } else if (text == 3) {
+            return '募集结束'
+          } else {
+            return '异常'
+          }
+        }
+      },
+      {
+        title: '状态',
+        dataIndex: 'status',
+        className: 'styletitle',
+        render: (text: string | number) => {
+          if (text == 0) {
+            return '待审核'
+          } else if (text == 1) {
+            return '审核通过'
+          } else {
+            return '异常'
+          }
+        }
+      },
+      {
+        title: '操作',
+        dataIndex: 'action',
+
+        render: (text: string, record) => {
+          return (
+            <Space>
+              <Row> 
+                <Col  sm={24}   xl={6} style={{marginBottom:20}}>
+                  <Button type="primary" size={"small"} onClick={(e) => handleEdit(record)}>编辑</Button>
+                </Col>
+              
+                <Col  sm={24}   xl={6}  style={{marginBottom:20}}>
+                  {isadmin && <Button type="primary" size={"small"} onClick={(e) => handleAudit(record)}>审核</Button>}
+                </Col>
+                <div style={{height:20}}></div>
+                <Col  sm={24}   xl={6}> 
+                  <Popconfirm
+                    title="确定要下架此活动吗，下架后不可恢复?"
+                    onConfirm={() => handleDelete(record)}
+                    okText="确定"
+                    cancelText="取消"
+                  >
+                    <Button danger size={"small"} >下架</Button>
+                  </Popconfirm>
+                </Col>
+              </Row>
+
+
+            </Space>
+          )
+        }
+      }
+    ]
+  }
+
   const handleAdd = () => {
     setCurrent({})
     setFormVisible(true);
@@ -230,6 +336,10 @@ const TableList: React.FC = () => {
   const handleClose = () => {
     setCurrent({})
     setFormVisible(false);
+  }
+
+  const replace = (url: any) => {
+    return url.replace(requestPrefixImage, '')
   }
 
   useEffect(() => {
@@ -250,28 +360,29 @@ const TableList: React.FC = () => {
 
   const onFinish = (values: any) => {
     console.log("onFinish", values)
-    if((current as any).id){ 
-      edit({...values,id:(current as any).id}).then(res => {
-        message.success('创建任务成功');
-        form.resetFields();
-        forceUpdate([]);
-        setFormVisible(false);
-      })
-    }else{
-      add(values).then(res => {
+    if ((current as any).id) {
+      edit({ ...values, id: (current as any).id, company_logo: replace(values.company_logo), title_img: replace(values.title_img), banner: replace(values.banner) }).then(res => {
         message.success('编辑任务成功');
         form.resetFields();
         forceUpdate([]);
         setFormVisible(false);
       })
+    } else {
+      add({ ...values, company_logo: replace(values.company_logo), title_img: replace(values.title_img), banner: replace(values.banner) }).then(res => {
+        message.success('添加任务成功');
+        form.resetFields();
+        forceUpdate([]);
+        setFormVisible(false);
+      })
     }
-    
   }
+
+
 
   return (
     <PageContainer>
       <Card>
-        <Button type="primary" onClick={handleAdd}>增加活动</Button>
+        {!isadmin && <Button type="primary" onClick={handleAdd}>增加活动</Button>}
       </Card>
       <Table
         columns={columns}
@@ -282,7 +393,7 @@ const TableList: React.FC = () => {
         loading={loading}
       />
       <Drawer
-        title={(current as any).id?"编辑活动":"增加活动"}
+        title={(current as any).id ? "编辑活动" : "增加活动"}
         placement="right"
         visible={formVisible}
         onClose={handleClose}
@@ -295,7 +406,7 @@ const TableList: React.FC = () => {
           {...layout}
         >
           <Row gutter={20}>
-            <Col span={6} key={0}>
+            <Col lg={6} key={0}>
               <Form.Item
                 name={`title`}
                 label={`标题`}
@@ -311,7 +422,7 @@ const TableList: React.FC = () => {
                 />
               </Form.Item>
             </Col>
-            <Col span={6} key={1}>
+            <Col lg={6} key={1}>
               <Form.Item
                 name={`title_img`}
                 label={`活动图片必传`}
@@ -324,7 +435,7 @@ const TableList: React.FC = () => {
                 <ImagePicker />
               </Form.Item>
             </Col>
-            <Col span={6} key={2}>
+            <Col lg={6} key={2}>
               <Form.Item
                 name={`sector`}
                 label={`活动部门`}
@@ -341,7 +452,7 @@ const TableList: React.FC = () => {
               </Form.Item>
             </Col>
 
-            <Col span={6} key={3}>
+            <Col lg={6} key={3}>
               <Form.Item
                 name={`formstatus`}
                 label={`活动状态`}
@@ -355,7 +466,7 @@ const TableList: React.FC = () => {
                 <StatusSelect />
               </Form.Item>
             </Col>
-            <Col span={6} key={4}>
+            <Col lg={6} key={4}>
               <Form.Item
                 name={`content`}
                 label={`活动内容`}
@@ -366,10 +477,10 @@ const TableList: React.FC = () => {
                   },
                 ]}
               >
-                <Input.TextArea placeholder={"请输入活动内容"} rows={4}   />
+                <Input.TextArea placeholder={"请输入活动内容"} rows={4} />
               </Form.Item>
             </Col>
-            <Col span={6} key={5}>
+            <Col lg={6} key={5}>
               <Form.Item
                 name={`fundingTarget`}
                 label={`融资目标`}
@@ -383,7 +494,7 @@ const TableList: React.FC = () => {
                 <InputNumber placeholder={"请输入融资目标"} style={{ width: '100%' }} />
               </Form.Item>
             </Col>
-            <Col span={6} key={6}>
+            <Col lg={6} key={6}>
               <Form.Item
                 name={`slogan`}
                 label={`活动口号`}
@@ -394,10 +505,10 @@ const TableList: React.FC = () => {
                   },
                 ]}
               >
-                <Input.TextArea placeholder={"请输入活动口号"} rows={4}   />
+                <Input.TextArea placeholder={"请输入活动口号"} rows={4} />
               </Form.Item>
             </Col>
-            <Col span={6} key={7}>
+            <Col lg={6} key={7}>
               <Form.Item
                 name={`banner`}
                 label={`活动横幅`}
@@ -411,7 +522,7 @@ const TableList: React.FC = () => {
                 <ImagePicker />
               </Form.Item>
             </Col>
-            <Col span={6} key={8}>
+            <Col lg={6} key={8}>
               <Form.Item
                 name={`overview`}
                 label={`活动概述`}
@@ -422,10 +533,10 @@ const TableList: React.FC = () => {
                   },
                 ]}
               >
-                <Input.TextArea placeholder={"请输入活动口号"} rows={4}  />
+                <Input.TextArea placeholder={"请输入活动口号"} rows={4} />
               </Form.Item>
             </Col>
-            <Col span={6} key={9}>
+            <Col lg={6} key={9}>
               <Form.Item
                 name={`underwrite`}
                 label={`活动承接`}
@@ -439,7 +550,7 @@ const TableList: React.FC = () => {
                 <Input placeholder={"请输入活动承接"} />
               </Form.Item>
             </Col>
-            <Col span={6} key={10}>
+            <Col lg={6} key={10}>
               <Form.Item
                 name={`website`}
                 label={`活动网站`}
@@ -453,7 +564,7 @@ const TableList: React.FC = () => {
                 <Input placeholder={"请输入活动网站"} />
               </Form.Item>
             </Col>
-            <Col span={6} key={18}>
+            <Col lg={6} key={18}>
               <Form.Item
                 name={`company_logo`}
                 label={`公司logo`}
@@ -467,7 +578,7 @@ const TableList: React.FC = () => {
                 <ImagePicker />
               </Form.Item>
             </Col>
-            <Col span={6} key={19}>
+            <Col lg={6} key={19}>
               <Form.Item
                 name={`type`}
                 label={`债券类型`}
@@ -481,7 +592,7 @@ const TableList: React.FC = () => {
                 <StockSelect />
               </Form.Item>
             </Col>
-            <Col span={6} key={20}>
+            <Col lg={6} key={20}>
               <Form.Item
                 name={`language`}
                 label={`语言`}
@@ -509,7 +620,7 @@ const TableList: React.FC = () => {
               >
                 <HightlightsForm />
               </Form.Item>
-            </Col>  
+            </Col>
             <Col span={24} key={22} >
               <Form.Item
                 {...allLayout}
@@ -527,15 +638,15 @@ const TableList: React.FC = () => {
             </Col>
           </Row>
           <Row>
-            <div style={{ display: 'flex', justifyContent: 'center',width: '90%' }}>
-              <Space>
+            <div style={{ display: 'flex', justifyContent: 'center', width: '90%' }}>
+              {!isadmin && <Space>
                 <Button type="primary" htmlType="submit">
                   提交
-            </Button>
+                </Button>
                 <Button onClick={handleReset}>
                   重置
-            </Button>
-              </Space>
+                </Button>
+              </Space>}
             </div>
           </Row>
         </Form>

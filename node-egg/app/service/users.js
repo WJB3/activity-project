@@ -28,8 +28,7 @@ class UserService extends Service {
   }
 
   async getCurrent(){ 
-    const userId=await this.getCurrentUserId();
-    console.log("userId",userId)
+    const userId=await this.getCurrentUserId(); 
     let result;
     let isadmin=false;
     //是管理员

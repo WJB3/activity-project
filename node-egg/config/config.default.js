@@ -36,6 +36,7 @@ module.exports = appInfo => {
       enable:false, 
     }
   }
+ 
 
   config.mysql = {
     // 单数据库信息配置

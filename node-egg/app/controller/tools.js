@@ -26,6 +26,7 @@ class HomeController extends Controller {
             [fieldname]:dir.saveDir
         })
     }
+    console.log("files",files)
     if(Object.keys(files).length>0){
         ctx.body={
             code:200,

@@ -51,4 +51,8 @@ module.exports = app => {
 
   //查看活动id对应的finiance
   router.get('/finance/:id',jwt,controller.company.getFinance);
+  //保存图片
+  router.post('/tools/resource', controller.tools.saveImage);
+  //活动接口
+  router.get('/getActivityList',controller.activity.getActivityList);
 };

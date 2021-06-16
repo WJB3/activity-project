@@ -37,7 +37,7 @@ request.interceptors.response.use(async response => {
       description: '服务器内部错误',
       message: data.msg,
     });
-    return Promise.reject()
+    // return Promise.reject()
   }
   return Promise.resolve(data.data)
 });

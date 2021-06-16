@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { LoadingOutlined, PlusOutlined } from '@ant-design/icons';
 import { Upload, message } from 'antd';
+import { requestPrefix,requestPrefixImage } from '@/services/config'
 
 function getBase64(img:any, callback:any) {
     const reader = new FileReader();
@@ -45,6 +46,7 @@ const ImagePicker = (props: any) => {
         }
         if (info.file.status === 'done') {
             if(info && info.fileList && info.fileList.length && info.fileList[0].response){
+                console.log("info.fileList[0].response.data[imageName]",info.fileList[0].response.data[imageName])
                 props.onChange(info.fileList[0].response.data[imageName]);
             }
             // Get this url from response in real world.
@@ -67,7 +69,7 @@ const ImagePicker = (props: any) => {
             name={imageName}
             listType="picture-card"
             showUploadList={false}
-            action="http://127.0.0.1:7001/tools/resource"
+            action={`${requestPrefix}/tools/resource`}
             beforeUpload={beforeUpload}
             onChange={handleChange}
         >
